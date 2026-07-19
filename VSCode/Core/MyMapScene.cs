@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FortRise;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 
-namespace TFModFortRisePoto
+namespace TFModFortRiseAccelerate
 {
-  internal class MyMapScene
+  public class MyMapScene : IHookable
   {
     private static readonly Random rng = new Random();
     private static List<Point> shuffledLevelIds = new List<Point>();
@@ -14,38 +16,36 @@ namespace TFModFortRisePoto
     private static MapScene lastScene;
     private static bool confirmedForCurrentScene;
 
-    internal static void Load()
+    public static void Load(IHarmony harmony)
     {
-      On.TowerFall.MapScene.Update += Update_patch;
-      On.TowerFall.MapScene.InitButtons += InitButtons_patch;
+      harmony.Patch(
+          AccessTools.DeclaredMethod(typeof(MapScene), nameof(MapScene.Update)),
+          postfix: new HarmonyMethod(Update_patch)
+      );
+      harmony.Patch(
+          AccessTools.DeclaredMethod(typeof(MapScene), "InitButtons"),
+          postfix: new HarmonyMethod(InitButtons_patch)
+      );
     }
 
-    internal static void Unload()
+    public static void InitButtons_patch(MapScene __instance, MapButton startSelection)
     {
-      On.TowerFall.MapScene.Update -= Update_patch;
-      On.TowerFall.MapScene.InitButtons -= InitButtons_patch;
+      __instance.Selection = __instance.Buttons[3];
     }
 
-    public static void InitButtons_patch(On.TowerFall.MapScene.orig_InitButtons orig, global::TowerFall.MapScene self, global::TowerFall.MapButton startSelection)
+    public static void Update_patch(MapScene __instance)
     {
-      orig(self, startSelection);
-      self.Selection = self.Buttons[3];
-    }
-
-    public static void Update_patch(On.TowerFall.MapScene.orig_Update orig, global::TowerFall.MapScene self)
-    {
-      orig(self);
       //SaveData.Instance.Options.ReplayMode = Options.ReplayModes.Off; //see Level.PostScreen
-      if (self.Mode == MainMenu.RollcallModes.Versus && TFModFortRisePotoModule.Settings.selectRandomLevelAuto) {
-        if (lastScene != self) {
-          lastScene = self;
+      if (__instance.Mode == MainMenu.RollcallModes.Versus && TFModFortRiseAccelerateModule.Settings.selectRandomLevelAuto) {
+        if (lastScene != __instance) {
+          lastScene = __instance;
           confirmedForCurrentScene = false;
-          SelectNextShuffledLevel(self);
+          SelectNextShuffledLevel(__instance);
         }
 
-        if (!confirmedForCurrentScene && self.CanAct && !self.MatchStarting && !self.CanConfirmCounter) {
+        if (!confirmedForCurrentScene && __instance.CanAct && !__instance.MatchStarting && !__instance.CanConfirmCounter) {
           confirmedForCurrentScene = true;
-          self.Selection.Confirmed();
+          __instance.Selection.Confirmed();
         }
       }
     }

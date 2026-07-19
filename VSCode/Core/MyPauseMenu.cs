@@ -1,33 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TowerFall;
+using FortRise;
+using HarmonyLib;
 using Monocle;
-using MonoMod.Utils;
-using Microsoft.Xna.Framework;
+using TowerFall;
 
-namespace TFModFortRisePoto
+namespace TFModFortRiseAccelerate
 {
-  internal class MyPauseMenu
+  public class MyPauseMenu : IHookable
   {
-    internal static void Load()
+    public static void Load(IHarmony harmony)
     {
-      On.TowerFall.PauseMenu.VersusRematch += VersusRematch_patch;
+      harmony.Patch(
+          AccessTools.DeclaredMethod(typeof(PauseMenu), "VersusRematch"),
+          prefix: new HarmonyMethod(VersusRematch_patch)
+      );
     }
 
-    internal static void Unload()
+    public static void VersusRematch_patch(PauseMenu __instance)
     {
-      On.TowerFall.PauseMenu.VersusRematch -= VersusRematch_patch;
-    }
-
-
-    public static void VersusRematch_patch(On.TowerFall.PauseMenu.orig_VersusRematch orig, global::TowerFall.PauseMenu self)
-    {
-      if (TFModFortRisePotoModule.Settings.accelerate)
-        Engine.TimeRate = TFModFortRisePotoModule.Settings.acceleration;
-      orig(self);
+      if (TFModFortRiseAccelerateModule.Settings.accelerate)
+        Engine.TimeRate = TFModFortRiseAccelerateModule.Settings.acceleration;
     }
   }
 }

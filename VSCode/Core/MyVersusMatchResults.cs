@@ -1,36 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Monocle;
-using MonoMod.Utils;
-using TowerFall;
+using FortRise;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
+using Monocle;
+using TowerFall;
 
-namespace TFModFortRisePoto
+namespace TFModFortRiseAccelerate
 {
-  internal class MyVersusMatchResults
+  public class MyVersusMatchResults : IHookable
   {
-    internal static void Load()
+    public static void Load(IHarmony harmony)
     {
-      On.TowerFall.VersusMatchResults.ctor += ctor_patch;
+      harmony.Patch(
+          AccessTools.DeclaredConstructor(typeof(VersusMatchResults), [
+                                                                        typeof(Session),
+                                                                        typeof(VersusRoundResults),
+                                                                     ]),
+          prefix: new HarmonyMethod(ctor_prefix_patch),
+          postfix: new HarmonyMethod(ctor_postfix_patch)
+      );
     }
 
-    internal static void Unload()
+    public static void ctor_prefix_patch(VersusMatchResults __instance, Session session, VersusRoundResults roundResults)
     {
-      On.TowerFall.VersusMatchResults.ctor -= ctor_patch;
+      if (TFModFortRiseAccelerateModule.Settings.accelerate)
+        Engine.TimeRate = TFModFortRiseAccelerateModule.Settings.acceleration;
     }
 
-    public static void ctor_patch(On.TowerFall.VersusMatchResults.orig_ctor orig, global::TowerFall.VersusMatchResults self, global::TowerFall.Session session, global::TowerFall.VersusRoundResults roundResults)
+    public static void ctor_postfix_patch(VersusMatchResults __instance, Session session, VersusRoundResults roundResults)
     {
-      if (TFModFortRisePotoModule.Settings.accelerate)
-        Engine.TimeRate = TFModFortRisePotoModule.Settings.acceleration;
-      orig(self, session, roundResults);
-      if (TFModFortRisePotoModule.Settings.accelerate && TFModFortRisePotoModule.Settings.accelerateMatchResultScreen)
+      if (TFModFortRiseAccelerateModule.Settings.accelerate && TFModFortRiseAccelerateModule.Settings.accelerateMatchResultScreen)
       {
         session.CurrentLevel.Add(new PauseMenu(session.CurrentLevel, new Vector2(160f, 200f), PauseMenu.MenuType.VersusMatchEnd));
-        self.TweenIn();
+        __instance.TweenIn();
       }
     }
   }

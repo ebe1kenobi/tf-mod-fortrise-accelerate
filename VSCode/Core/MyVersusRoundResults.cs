@@ -1,32 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FortRise;
+using HarmonyLib;
 using Monocle;
-using Microsoft.Xna.Framework;
-using MonoMod.Utils;
 using TowerFall;
 
-namespace TFModFortRisePoto
+namespace TFModFortRiseAccelerate
 {
-  internal class MyVersusRoundResults
+  public class MyVersusRoundResults : IHookable
   {
-    internal static void Load()
+    public static void Load(IHarmony harmony)
     {
-      On.TowerFall.VersusRoundResults.Update += Update_patch;
+      harmony.Patch(
+          AccessTools.DeclaredMethod(typeof(VersusRoundResults), nameof(VersusRoundResults.Update)),
+          prefix: new HarmonyMethod(Update_patch)
+      );
     }
 
-    internal static void Unload()
+    public static void Update_patch(VersusRoundResults __instance)
     {
-      On.TowerFall.VersusRoundResults.Update -= Update_patch;
-    }
-
-    public static void Update_patch(On.TowerFall.VersusRoundResults.orig_Update orig, global::TowerFall.VersusRoundResults self)
-    {
-      if (TFModFortRisePotoModule.Settings.accelerate)
-        Engine.TimeRate = TFModFortRisePotoModule.Settings.acceleration;
-      orig(self);
+      if (TFModFortRiseAccelerateModule.Settings.accelerate)
+        Engine.TimeRate = TFModFortRiseAccelerateModule.Settings.acceleration;
     }
   }
 }
