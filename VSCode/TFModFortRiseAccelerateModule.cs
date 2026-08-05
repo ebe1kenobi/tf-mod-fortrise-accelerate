@@ -33,8 +33,7 @@ namespace TFModFortRiseAccelerate
 
       // FortRise 5 vit hors du repertoire de TowerFall : on ecrit les logs dans
       // l'espace de sauvegarde du mod, pas dans un chemin relatif au jeu.
-      TFModFortRiseAccelerate.Logger.Init(
-          Path.Combine(ModIO.GetRootPath(), "Saves", Meta.Name));
+      TFModFortRiseAccelerate.Logger.Init(Meta.Name);
 
       foreach (var hookable in Hookables)
       {
