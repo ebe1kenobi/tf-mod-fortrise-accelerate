@@ -17,6 +17,8 @@ Data and log files live in `<TowerFall>/FortRise/Saves/Accelerate/` and `<TowerF
 
 Everything is in the mod settings; there is no variant and no dedicated key.
 
+<img width="730" height="294" alt="image" src="https://github.com/user-attachments/assets/4247ddd4-8299-4114-9c86-45796a500829" />
+
 ## Settings
 
 | Setting | Purpose |
