@@ -17,7 +17,7 @@ namespace TFModFortRiseAccelerate
 
     //[SettingsName("Acceleration")]
     //[SettingsNumber(1, 20)]
-    public int acceleration { get; set; } = 15;
+    public int acceleration { get; set; } = 5;
 
     //[SettingsName("Select Random Level Auto")]
     public bool selectRandomLevelAuto { get; set; } = false;
