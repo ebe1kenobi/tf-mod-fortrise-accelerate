@@ -1,5 +1,7 @@
 # Accelerate
 
+<img width="882" height="247" alt="image" src="https://github.com/user-attachments/assets/d65e06ba-3834-4584-b1de-4211813a7fa5" />
+
 Speeds up the dead time of a game night: faster gameplay, automatic level pick and
 a shortened results screen.
 
